@@ -1,5 +1,82 @@
 import React from 'react';
 
+// --- A component to inject global styles and animations ---
+const GlobalStyles = () => (
+  <style>{`
+    @keyframes fade-in-down {
+      0% {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fade-in-up {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse-bright {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.7);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 12px rgba(45, 212, 191, 0);
+      }
+    }
+
+    /* Animation utility classes */
+    .animate-fade-in-down {
+      animation: fade-in-down 0.8s ease-out forwards;
+    }
+    .animate-fade-in-up {
+      animation: fade-in-up 0.8s ease-out forwards;
+    }
+    .animate-pulse-bright {
+      animation: pulse-bright 2.5s infinite;
+    }
+
+    /* Custom nav link hover effect */
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease-in-out;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: -6px;
+      left: 0;
+      background-color: #2dd4bf; /* Tailwind's teal-400 */
+      transform-origin: bottom right;
+      transition: transform 0.3s ease-out;
+    }
+    .nav-link:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+
+    /* Ensure content that will be animated starts as invisible */
+    .initial-hidden {
+      opacity: 0;
+    }
+  `}</style>
+);
+
+
 // --- Icon Components (Inlined SVGs for single-file setup) ---
 const LogoIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="4">
@@ -69,16 +146,33 @@ const PenToolIcon = ({ className }) => (
 
 // --- Main App Component ---
 export default function App() {
+  // State for the scroll progress bar
+  const [scrollProgress, setScrollProgress] = React.useState(0);
+
+  // Effect to listen to scroll events
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Cleanup function to remove the event listener
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+
   // --- Data for your Agency/Services ---
   // ¡Personaliza esta sección con tu propia información!
   const companyInfo = {
     name: "CodeGen",
     headline: "Transforming Ideas into Exceptional Software Solutions with AI",
     subheadline: "We specialize in custom web, mobile and desktop application development that drives your business and blog growth.",
-    email: "correo",
+    email: "contact@codegen.dev",
     // Set to real URLs if you have them, otherwise keep null so anchors are not rendered with invalid hrefs
-    github: null,
-    linkedin: null,
+    github: "https://github.com",
+    linkedin: "https://linkedin.com",
   };
 
   const services = [
@@ -136,7 +230,8 @@ export default function App() {
   // --- JSX Structure ---
   return (
     <div className="bg-gray-900 text-gray-200 font-sans leading-normal tracking-tight">
-      <Header companyInfo={companyInfo} />
+      <GlobalStyles />
+      <Header companyInfo={companyInfo} scrollProgress={scrollProgress} />
       <main>
         <Hero companyInfo={companyInfo} />
         <Services services={services} />
@@ -153,19 +248,21 @@ export default function App() {
 
 // --- Section Components ---
 
-const Header = ({ companyInfo }) => (
+const Header = ({ companyInfo, scrollProgress }) => (
   <header className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
+    {/* Scroll Progress Bar */}
+    <div className="absolute top-0 left-0 h-1 bg-teal-400/80 transition-all duration-150 ease-out" style={{ width: `${scrollProgress}%` }} />
     <nav className="container mx-auto px-6 md:px-12 py-4 flex justify-between items-center">
       {/* Changed href from '#' to '#hero' to provide a valid, accessible target */}
-      <a href="#hero" className="flex items-center gap-3" aria-label="Go to top">
-        <LogoIcon className="w-8 h-8 text-teal-400" />
+      <a href="#hero" className="flex items-center gap-3 group" aria-label="Go to top">
+        <LogoIcon className="w-8 h-8 text-teal-400 group-hover:animate-spin" style={{ animationDuration: '3s' }} />
         <span className="text-2xl font-bold text-teal-400">{companyInfo.name}</span>
       </a>
-      <div className="hidden md:flex items-center space-x-6 font-medium">
-        <a href="#services" className="hover:text-teal-400 transition-colors duration-300">Services</a>
-        <a href="#portfolio" className="hover:text-teal-400 transition-colors duration-300">Portfolio</a>
-        <a href="#about-us" className="hover:text-teal-400 transition-colors duration-300">About Us</a>
-        <a href="#contact" className="bg-teal-500 text-gray-900 px-4 py-2 rounded-md hover:bg-teal-400 transition-colors duration-300">Contact Us</a>
+      <div className="hidden md:flex items-center space-x-8 font-medium">
+        <a href="#services" className="nav-link hover:text-teal-400">Services</a>
+        <a href="#portfolio" className="nav-link hover:text-teal-400">Portfolio</a>
+        <a href="#about-us" className="nav-link hover:text-teal-400">About Us</a>
+        <a href="#contact" className="bg-teal-500 text-gray-900 px-4 py-2 rounded-md hover:bg-teal-400 transition-all duration-300 transform hover:scale-105">Contact Us</a>
       </div>
     </nav>
   </header>
@@ -174,11 +271,11 @@ const Header = ({ companyInfo }) => (
 const Hero = ({ companyInfo }) => (
   <section id="hero" className="py-24 md:py-32 bg-gray-900">
     <div className="container mx-auto px-6 md:px-12 text-center">
-      <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4">
+      <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight mb-4 animate-fade-in-down initial-hidden">
         {companyInfo.headline}
       </h1>
-      <p className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10">{companyInfo.subheadline}</p>
-      <a href="#contact" className="inline-block bg-teal-500 text-gray-900 font-bold px-8 py-4 rounded-lg shadow-lg hover:bg-teal-400 transition-all duration-300 transform hover:scale-105">
+      <p style={{ animationDelay: '200ms' }} className="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 mb-10 animate-fade-in-down initial-hidden">{companyInfo.subheadline}</p>
+      <a href="#contact" style={{ animationDelay: '400ms' }} className="inline-block bg-teal-500 text-gray-900 font-bold px-8 py-4 rounded-lg shadow-lg hover:bg-teal-400 transition-all duration-300 transform hover:scale-105 animate-pulse-bright">
         Get a Quote
       </a>
     </div>
@@ -188,12 +285,16 @@ const Hero = ({ companyInfo }) => (
 const Services = ({ services }) => (
   <section id="services" className="py-20 bg-gray-800">
     <div className="container mx-auto px-6 md:px-12">
-      <h2 className="text-3xl font-bold text-center mb-12">
+      <h2 className="text-3xl font-bold text-center mb-12 animate-fade-in-up initial-hidden">
         Our <span className="text-teal-400">Services</span>
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
         {services.map((service, index) => (
-          <div key={index} className="bg-gray-900 p-8 rounded-lg shadow-lg transform hover:-translate-y-2 transition-transform duration-300">
+          <div
+            key={index}
+            className="bg-gray-900 p-8 rounded-lg shadow-lg transform hover:-translate-y-2 transition-transform duration-300 animate-fade-in-up initial-hidden"
+            style={{ animationDelay: `${index * 150}ms` }}
+          >
             {service.icon}
             <h3 className="text-2xl font-bold mb-3 text-white">{service.title}</h3>
             <p className="text-gray-400">{service.description}</p>
@@ -208,20 +309,27 @@ const Services = ({ services }) => (
 const Portfolio = ({ portfolio }) => (
   <section id="portfolio" className="py-20">
     <div className="container mx-auto px-6 md:px-12">
-      <h2 className="text-3xl font-bold text-center mb-12">
+      <h2 className="text-3xl font-bold text-center mb-12 animate-fade-in-up initial-hidden">
         Our <span className="text-teal-400">Portfolio</span>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {portfolio.map((project, index) => (
-          <ProjectCard key={index} project={project} />
+          <ProjectCard
+            key={index}
+            project={project}
+            animationDelay={`${(index * 150) + 200}ms`}
+          />
         ))}
       </div>
     </div>
   </section>
 );
 
-const ProjectCard = ({ project }) => (
-  <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out flex flex-col">
+const ProjectCard = ({ project, animationDelay }) => (
+  <div
+    className="bg-gray-800 rounded-lg shadow-xl overflow-hidden transform hover:-translate-y-2 transition-transform duration-300 ease-in-out flex flex-col animate-fade-in-up initial-hidden"
+    style={{ animationDelay }}
+  >
     <img src={project.imageUrl} alt={project.title} className="w-full h-48 object-cover" />
     <div className="p-6 flex flex-col flex-grow">
       <h3 className="text-xl font-bold mb-2 text-teal-400">{project.title}</h3>
@@ -267,10 +375,10 @@ const ProjectCard = ({ project }) => (
 const AboutUs = () => (
   <section id="about-us" className="py-20 bg-gray-800">
     <div className="container mx-auto px-6 md:px-12">
-      <h2 className="text-3xl font-bold text-center mb-12">
+      <h2 className="text-3xl font-bold text-center mb-12 animate-fade-in-up initial-hidden">
         About <span className="text-teal-400">Us</span>
       </h2>
-      <div className="max-w-4xl mx-auto text-lg text-gray-400 space-y-4 text-center">
+      <div className="max-w-4xl mx-auto text-lg text-gray-400 space-y-4 text-center animate-fade-in-up initial-hidden" style={{ animationDelay: '150ms' }}>
         <p>
           We are a team of developers, designers, and strategists passionate about technology. Our mission is to help businesses of all sizes reach their full potential through innovative and high-quality digital solutions.
         </p>
@@ -285,11 +393,11 @@ const AboutUs = () => (
 const Technologies = ({ technologies }) => (
   <section id="technologies" className="py-20">
     <div className="container mx-auto px-6 md:px-12">
-      <h2 className="text-3xl font-bold text-center mb-12">
+      <h2 className="text-3xl font-bold text-center mb-12 animate-fade-in-up initial-hidden">
         Technologies We <span className="text-teal-400">Master</span>
       </h2>
       <div className="max-w-4xl mx-auto">
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-4 animate-fade-in-up initial-hidden" style={{ animationDelay: '150ms' }}>
           {technologies.map((tech, index) => (
             <div key={index} className="bg-gray-800 text-gray-300 px-4 py-2 rounded-md shadow-md font-medium">
               {tech}
@@ -304,15 +412,16 @@ const Technologies = ({ technologies }) => (
 const Contact = ({ email }) => (
   <section id="contact" className="py-20 bg-teal-900/20 text-center">
     <div className="container mx-auto px-6 md:px-12">
-      <h2 className="text-3xl font-bold mb-6">
+      <h2 className="text-3xl font-bold mb-6 animate-fade-in-up initial-hidden">
         Ready to Start Your <span className="text-teal-400">Next Project</span>?
       </h2>
-      <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
+      <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto animate-fade-in-up initial-hidden" style={{ animationDelay: '150ms' }}>
         We'd love to hear your idea. Contact us for a free, no-obligation consultation.
       </p>
       <a
         href={`mailto:${email}`}
         className="inline-block bg-teal-500 text-gray-900 font-bold px-8 py-4 rounded-lg shadow-lg hover:bg-teal-400 transition-all duration-300 transform hover:scale-105"
+        style={{ animationDelay: '300ms' }}
       >
         Let's Talk
       </a>
@@ -330,16 +439,16 @@ const Footer = ({ companyInfo }) => (
       </div>
       <div className="flex justify-center items-center space-x-6 mb-4">
         {companyInfo.github && (
-          <a href={companyInfo.github} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
+          <a href={companyInfo.github} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-125">
             <GitHubIcon className="w-6 h-6" />
           </a>
         )}
         {companyInfo.linkedin && (
-          <a href={companyInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
+          <a href={companyInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-125">
             <LinkedInIcon className="w-6 h-6" />
           </a>
         )}
-        <a href={`mailto:${companyInfo.email}`} className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
+        <a href={`mailto:${companyInfo.email}`} className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-125">
           <MailIcon className="w-6 h-6" />
         </a>
       </div>
