@@ -1,7 +1,6 @@
 import React from 'react';
 
 // --- Icon Components (Inlined SVGs for single-file setup) ---
-
 const LogoIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="4">
     <defs>
@@ -77,8 +76,9 @@ export default function App() {
     headline: "Transforming Ideas into Exceptional Software Solutions with AI",
     subheadline: "We specialize in custom web, mobile and desktop application development that drives your business and blog growth.",
     email: "francisco_quezadar@outlook.com",
-    //github: "https://github.com/pixelgen-dev",
-    //linkedin: "https://linkedin.com/company/pixelgen-dev",
+    // Set to real URLs if you have them, otherwise keep null so anchors are not rendered with invalid hrefs
+    github: null,
+    linkedin: null,
   };
 
   const services = [
@@ -114,16 +114,16 @@ export default function App() {
       title: "E-commerce App",
       description: "A B2C e-commerce platform with payment integrations, inventory management, and sales analytics for our client TechCorp.",
       tags: ["React", "Node.js", "Stripe", "MongoDB", "AWS"],
-      liveUrl: "#",
-      repoUrl: "#",
+      liveUrl: null, // use null instead of '#'
+      repoUrl: null,
       imageUrl: "https://placehold.co/600x400/1a202c/718096?text=E-commerce+App"
     },
     {
       title: "Colaborators Management",
       description: "A learning management system (LMS) with video courses, progress tracking, and discussion forums for an EdTech startup.",
       tags: ["Vue.js", "Firebase", "Node.js", "TailwindCSS"],
-      liveUrl: "#",
-      repoUrl: "#",
+      liveUrl: null,
+      repoUrl: null,
       imageUrl: "https://placehold.co/600x400/1a202c/718096?text=Educational+Platform"
     }
   ];
@@ -157,7 +157,8 @@ export default function App() {
 const Header = ({ companyInfo }) => (
   <header className="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 shadow-md">
     <nav className="container mx-auto px-6 md:px-12 py-4 flex justify-between items-center">
-      <a href="#" className="flex items-center gap-3">
+      {/* Changed href from '#' to '#hero' to provide a valid, accessible target */}
+      <a href="#hero" className="flex items-center gap-3" aria-label="Go to top">
         <LogoIcon className="w-8 h-8 text-teal-400" />
         <span className="text-2xl font-bold text-teal-400">{companyInfo.name}</span>
       </a>
@@ -234,14 +235,31 @@ const ProjectCard = ({ project }) => (
         ))}
       </div>
       <div className="mt-auto flex justify-between items-center">
-        <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center gap-2">
-          <GitHubIcon className="w-5 h-5" />
-          Code
-        </a>
-        <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center gap-2">
-          View App
-          <ExternalLinkIcon className="w-5 h-5" />
-        </a>
+        {/* Conditionally render repo link only if repoUrl exists */}
+        {project.repoUrl ? (
+          <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center gap-2">
+            <GitHubIcon className="w-5 h-5" />
+            Code
+          </a>
+        ) : (
+          <span className="text-gray-600 flex items-center gap-2 cursor-not-allowed opacity-70">
+            <GitHubIcon className="w-5 h-5" />
+            Code
+          </span>
+        )}
+
+        {/* Conditionally render live link only if liveUrl exists */}
+        {project.liveUrl ? (
+          <a href={project.liveUrl} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-teal-400 transition-colors duration-300 flex items-center gap-2">
+            View App
+            <ExternalLinkIcon className="w-5 h-5" />
+          </a>
+        ) : (
+          <span className="text-gray-600 flex items-center gap-2 cursor-not-allowed opacity-70">
+            View App
+            <ExternalLinkIcon className="w-5 h-5" />
+          </span>
+        )}
       </div>
     </div>
   </div>
@@ -312,12 +330,16 @@ const Footer = ({ companyInfo }) => (
         <span className="text-xl font-bold text-gray-400">{companyInfo.name}</span>
       </div>
       <div className="flex justify-center items-center space-x-6 mb-4">
-        <a href={companyInfo.github} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
-          <GitHubIcon className="w-6 h-6" />
-        </a>
-        <a href={companyInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
-          <LinkedInIcon className="w-6 h-6" />
-        </a>
+        {companyInfo.github && (
+          <a href={companyInfo.github} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
+            <GitHubIcon className="w-6 h-6" />
+          </a>
+        )}
+        {companyInfo.linkedin && (
+          <a href={companyInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
+            <LinkedInIcon className="w-6 h-6" />
+          </a>
+        )}
         <a href={`mailto:${companyInfo.email}`} className="hover:text-teal-400 transition-transform duration-300 transform hover:scale-110">
           <MailIcon className="w-6 h-6" />
         </a>
