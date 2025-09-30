@@ -112,19 +112,19 @@ export default function App() {
   const portfolio = [
     {
       title: "E-commerce App",
-      description: "A B2C e-commerce platform with payment integrations, inventory management, and sales analytics for our client TechCorp.",
-      tags: ["React", "Node.js", "Stripe", "MongoDB", "AWS"],
+      description: "E-commerce platform with payment integrations, cart and animations.",
+      tags: ["PHP", "Javascript", "JQuery", "MySql", "HTML", "CSS"],
       liveUrl: null, // use null instead of '#'
       repoUrl: null,
       imageUrl: "https://placehold.co/600x400/1a202c/718096?text=E-commerce+App"
     },
     {
       title: "Colaborators Management",
-      description: "A learning management system (LMS) with video courses, progress tracking, and discussion forums for an EdTech startup.",
-      tags: ["Vue.js", "Firebase", "Node.js", "TailwindCSS"],
+      description: "System",
+      tags: ["Java", "Sqlite"],
       liveUrl: null,
       repoUrl: null,
-      imageUrl: "https://placehold.co/600x400/1a202c/718096?text=Educational+Platform"
+      imageUrl: "https://placehold.co/600x400/1a202c/718096?text=Colaborators+Management"
     }
   ];
 
