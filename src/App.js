@@ -75,7 +75,7 @@ export default function App() {
     name: "CodeGen",
     headline: "Transforming Ideas into Exceptional Software Solutions with AI",
     subheadline: "We specialize in custom web, mobile and desktop application development that drives your business and blog growth.",
-    email: "francisco_quezadar@outlook.com",
+    email: "correo",
     // Set to real URLs if you have them, otherwise keep null so anchors are not rendered with invalid hrefs
     github: null,
     linkedin: null,
@@ -129,9 +129,8 @@ export default function App() {
   ];
 
   const technologies = [
-    "JavaScript (ES6+)", "TypeScript", "React", "Vue.js", "Angular", "Node.js",
-    "Python", "MongoDB", "PostgreSQL", "GraphQL", "REST APIs",
-    "AWS", "Docker", "Git & GitHub"
+    "JavaScript (ES6+)", "C#", ".NET", "Java", "React", "React Native", "Node.js",
+    "MongoDB", "REST APIs", "AWS", "Docker", "Git & GitHub"
   ];
 
   // --- JSX Structure ---
